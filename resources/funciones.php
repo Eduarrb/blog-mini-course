@@ -1,4 +1,24 @@
 <?php
+
+    /* VARIABLES */
+    $meses = [
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'setiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
+    ];
+    /***********************************/
+
+
+
     /* FUNCIONES BASE */
     function query($sql){
         global $conexion;
@@ -54,6 +74,8 @@ DELIMITADOR;
     }
     /******************************************/
 
+
+
     /* FUNCIONES FRONT */
 
     function posts_show(){
@@ -105,6 +127,43 @@ DELIMITADOR;
 
 DELIMITADOR;
         echo $html;
+    }
+
+    function comentario_add($id){
+        if(isset($_POST['guardar'])){
+            // echo "funcionaaaaa";
+            $com_name = escape_string(trim($_POST['com_name']));
+            $com_email = escape_string(trim($_POST['com_email']));
+            $com_mensaje = escape_string(trim($_POST['com_mensaje']));
+
+            $query = query("INSERT INTO comentarios(com_post_id, com_name, com_email, com_mensaje, com_status, com_fecha) VALUES ({$id}, '{$com_name}', '{$com_email}', '{$com_mensaje}', 'pendiente', NOW())");
+            confirm($query);
+            set_msg(display_success_msg('Tu mensaje a sido enviado, espera a la aprobación del administrador'));
+            redirect("post.php?id={$id}");
+        }
+    }
+
+
+    function comentarios_show($id){
+        global $meses;
+
+        $query = query("SELECT *, YEAR(com_fecha) as anio, MONTH(com_fecha) as mes, DAY(com_fecha) as dia FROM comentarios WHERE com_post_id = {$id} AND com_status = 'aprobado'");
+        confirm($query);
+        while($row = fetch_array($query)){
+            $comentarios = <<<DELIMITADOR
+            <div class="media mb-4">
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                <div class="media-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mt-0">{$row['com_name']}</h5>
+                        <span>{$row['dia']} de {$meses[$row['mes'] - 1]}, {$row['anio']}</span>
+                    </div>
+                    {$row['com_mensaje']}
+                </div>
+            </div>
+DELIMITADOR;
+            echo $comentarios;
+        }
     }
 
     /********************************************/

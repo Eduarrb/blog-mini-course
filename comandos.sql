@@ -41,3 +41,7 @@ CREATE TABLE comentarios(
     com_status VARCHAR(255) NOT NULL,
     com_fecha DATETIME NOT NULL
 )
+
+SELECT * FROM comentarios
+
+SELECT *, year(com_fecha) as anio, month(com_fecha) as mes, day(com_fecha) as dia FROM comentarios
